@@ -105,32 +105,33 @@ Board.prototype.isOccupied = function (pos) {
  *
  * Returns empty array if no pieces of the opposite color are found.
  */
-Board.prototype._positionsToFlip = function(pos, color, dir, piecesToFlip=[]){
-  let xOneAway = pos[0]+dir[0];
-  let yOneAway = pos[1]+dir[1];
-  let nextPosition = [xOneAway, yOneAway];
+Board.prototype._positionsToFlip = function(pos, color, dir, piecesToFlip) {
+if (piecesToFlip === undefined) {
+  piecesToFlip = [];
+}
+  else {
+  piecesToFlip.push(pos) 
+}
 
-    if (this.isValidPos(pos) === false) {
-      return [];
+let xOneAway = pos[0]+dir[0];
+let yOneAway = pos[1]+dir[1];
+let nextPosition = [xOneAway, yOneAway];
+if(this.isValidPos(pos) === false) {
+  return []
+}
+else if(this.isValidPos(nextPosition) === false) {
+return []
+}
+else if (!this.isOccupied(nextPosition)) {
+  return []
+}
+else if (this.isMine(nextPosition, color)) {
+  return piecesToFlip;
+}
+else {
+return this._positionsToFlip(nextPosition, color, dir, piecesToFlip);
+};
 
-    } else if (!this.isOccupied(nextPosition) ) {
-      return [];
-
-    } 
-    else if (this.isMine(nextPosition,color)) {
-      return [];
-    } 
-
-    else if (!this.isMine(nextPosition,color)) {
-        return [];
-    }
-
-    else if (this.grid[xOneAway][yOneAway].color !== color) {
-      newPiecesToFlip = piecesToFlip.push([nextPosition])
-      array = this._positionsToFlip([nextPosition], color, dir, newPiecesToFlip);
-      return array;
-    }
-  
 };
 
 /**
@@ -139,19 +140,17 @@ Board.prototype._positionsToFlip = function(pos, color, dir, piecesToFlip=[]){
  * color being flipped.
  */
 Board.prototype.validMove = function (pos, color) {
-  //   if (this.isOccupied(pos)) {
-  //     return false
-  //   }
-  // // let valid = false
-  //  Board.DIRS.forEach(direction=>{
-  //     this.grid[pos[0]+direction[0]][pos[1]+direction[1]]
-  //     if (this.grid[pos[0]+direction[0]][pos[1]+direction[1]].color !== color)
-  //   if (this._positionsToFlip(pos, color, direction, []) !== []) {
-  //     {return true;
-  //   } else {
-  //     return false;
-  //   }
-  // })
+    if (this.isOccupied(pos)) {
+      return false
+    }
+  let valid = false
+   Board.DIRS.forEach(direction=>{
+     if (this._positionsToFlip(pos, color, direction).length !== 0) {
+      valid = true;
+     }
+    })
+
+return valid;
 };
 
 /**
