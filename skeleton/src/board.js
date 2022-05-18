@@ -160,6 +160,21 @@ return valid;
  * Throws an error if the position represents an invalid move.
  */
 Board.prototype.placePiece = function (pos, color) {
+  if (this.validMove(pos, color)) {
+    let piecesToFlip = [];
+
+    Board.DIRS.forEach(direction => 
+       piecesToFlip.push(this._positionsToFlip(pos, color, direction))
+      )
+      let piecesToFlipFlatten = piecesToFlip.flat();
+          piecesToFlipFlatten.forEach(position => 
+            this.grid[position[0]][position[1]].color = color
+          )
+        this.grid[pos[0]][pos[1]] = new Piece(color);
+
+  } else {
+    throw new Error("Invalid move!");
+  }
 };
 
 /**
@@ -167,12 +182,25 @@ Board.prototype.placePiece = function (pos, color) {
  * the Board for a given color.
  */
 Board.prototype.validMoves = function (color) {
+  let validPosition = [];
+  for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++){
+       if (this.validMove([i,j], color)) {
+         validPosition.push([i,j])
+       }
+      }
+    }
+    return validPosition;
 };
 
 /**
  * Checks if there are any valid moves for the given color.
  */
 Board.prototype.hasMove = function (color) {
+  if (this.validMoves(color).length === 0) {
+    return false;
+  }
+  return true;
 };
 
 
@@ -182,6 +210,7 @@ Board.prototype.hasMove = function (color) {
  * the black player are out of moves.
  */
 Board.prototype.isOver = function () {
+ return (!this.hasMove('white')) && (!this.hasMove('black'))
 };
 
 
